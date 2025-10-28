@@ -3,6 +3,7 @@ package com.example.lists
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -33,8 +34,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.lists.ComposeActivity.Companion.EXTRA_TEXT
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 
-class MainActivity : AppCompatActivity() {
+
+class MainActivity : ComponentActivity() {
     private val chiuitListState = mutableStateOf(ChiuitStore.getAllData())
 
 
@@ -59,6 +63,18 @@ class MainActivity : AppCompatActivity() {
                 // TODO 5: Use a vertical list that composes and displays only the visible items.
                 // TODO 6: Make use of Compose DSL to describe the content of the list and make sure
                 // to instantiate a [ChiuitListItem] for every item in [chiuitListState.value].
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 88.dp)
+                ) {
+                    items(
+                        items = chiuitListState.value,
+                        key = { it.description.hashCode() }
+                    ) { chiuit ->
+                        ChiuitListItem(chiuit)
+                    }
+                }
                 FloatingActionButton(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
@@ -140,6 +156,11 @@ class MainActivity : AppCompatActivity() {
         // TODO 7: Check if text is not null or empty, instantiate a new chiuit object
 
         //  then add it to the [chiuitListState.value].
+        val trimmed = resultText?.trim().orEmpty()
+        if (trimmed.isNotEmpty()) {
+            val current = chiuitListState.value
+            chiuitListState.value = current + Chiuit(trimmed)
+        }
 
     }
 
